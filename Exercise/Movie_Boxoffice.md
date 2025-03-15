@@ -59,3 +59,25 @@ FROM movies
     ON id = movie_id
 ORDER BY rating DESC
 ```
+4. List all movies and their combined sales in millions of dollars
+```sql
+SELECT title, (domestic_sales + international_sales)/ 1000000 
+FROM movies
+    INNER JOIN boxoffice
+    ON id = movie_id
+```
+5. List all movies and their ratings in percent
+```sql
+SELECT title, rating * 10 AS rating_percent
+FROM movies
+    JOIN boxoffice
+    ON movies.id = boxoffice.movie_id;
+```
+6. List all movies that were released on even number years
+```sql
+SELECT title, year
+FROM movies
+    JOIN boxoffice
+    ON movies.id = boxoffice.movie_id
+WHERE year % 2 = 0
+```
