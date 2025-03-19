@@ -231,4 +231,158 @@ SELECT *
 FROM parks_and_recreation.parks_departments;
 
 -- UNIONS
+-- Default is DISTINCT (only take unique and remove duplicates
+-- Keep data the same
+SELECT first_name, last_name
+FROM employee_demographics
+UNION 
+SELECT first_name, last_name
+FROM employee_salary
+;
+
+-- All result without 
+SELECT first_name, last_name
+FROM employee_demographics
+UNION ALL
+SELECT first_name, last_name
+FROM employee_salary
+;
+
+-- Multiple Union
+SELECT first_name, last_name, 'Old Man' AS Label
+FROM employee_demographics
+WHERE age > 40 AND gender = 'Male'
+UNION
+SELECT first_name, last_name, 'Old Lady' AS Label
+FROM employee_demographics
+WHERE age > 40 AND gender = 'Female'
+UNION 
+SELECT first_name, last_name, 'Highly Paid Employee' AS Label
+FROM employee_salary
+WHERE salary > 70000
+ORDER BY first_name, last_name
+;
+
+-- STRING functions
+-- LENGTH (ex: phone number) 
+SELECT LENGTH('skyfall');
+
+SELECT first_name, LENGTH(first_name)
+FROM employee_demographics
+ORDER BY 2;
+
+-- UPPERCASE and LOWERCASE
+SELECT UPPER('sky');
+SELECT LOWER('SKY');
+
+SELECT first_name, UPPER(first_name)
+FROM employee_demographics
+ORDER BY 2;
+
+-- TRIM: removes the space character OR other specified characters from the start or end of a string to get rid of it
+SELECT TRIM('   sky    ')
+;
+-- LEFT TRIM: remove the left space
+SELECT LTRIM('   sky    ')
+;
+-- RIGHT TRIM: remove the right space
+SELECT RTRIM('   sky    ')
+;
+
+-- SUBSTRING: extracts some characters from a string
+SELECT first_name, 
+LEFT(first_name, 4),
+RIGHT(first_name, 4)
+FROM employee_demographics;
+-- Start at the first position and get 2 char
+SELECT first_name, SUBSTRING(first_name, 3, 2)
+FROM employee_demographics;
+
+SELECT first_name, SUBSTRING(first_name, 3, 2), 
+birth_date, SUBSTRING(birth_date, 6, 2) AS birth_month
+FROM employee_demographics;
+
+-- REPLACE
+SELECT first_name, REPLACE(first_name, 'a', 'z')
+FROM employee_demographics;
+
+-- LOCATE
+SELECT LOCATE('x', 'Alexander');
+
+SELECT first_name, LOCATE('An', first_name)
+FROM employee_demographics;
+
+-- CONCAT: combines the column
+SELECT first_name, last_name, 
+CONCAT(first_name, ' ', last_name) AS full_name
+FROM employee_demographics;
+
+-- CASE STATEMENT
+SELECT first_name, last_name, age,
+CASE 
+	WHEN age <= 30 THEN 'Young'
+    WHEN age BETWEEN 31 and 50 THEN 'Old'
+    WHEN age >= 50 THEN "On Death's Door"
+END AS Age_BRACKET
+FROM employee_demographics;
+
+-- Ex: Pay Increase and Bonus
+-- < 50000 = 5%
+-- > 50000 = 7%
+-- Finance = 10% bonus
+SELECT first_name, last_name, salary,
+CASE
+	WHEN salary < 50000 THEN salary + (salary * 0.05)
+    WHEN salary > 50000 THEN salary + (salary * 0.07)
+END AS New_salary,
+CASE
+	WHEN dept_id = 6 THEN salary + (salary * 0.10)
+END AS Bonus
+FROM employee_salary;
+
+-- SUBQUERIES: queries is in other queries
+SELECT * 
+FROM employee_demographics
+WHERE employee_id IN 
+					(SELECT employee_id
+						FROM employee_salary
+                        WHERE dept_id = 1
+)
+;
+-- Compare 
+SELECT first_name, salary, 
+						( SELECT AVG(salary)
+							FROM employee_salary
+)
+FROM employee_salary
+GROUP BY first_name, salary
+;
+
+SELECT gender, AVG(age), MAX(age), MIN(age), COUNT(age)
+FROM employee_demographics
+GROUP BY gender;
+
+SELECT gender, AVG(`MAX(age)`)
+FROM 
+( SELECT gender, AVG(age), MAX(age), MIN(age), COUNT(age)
+FROM employee_demographics
+GROUP BY gender) AS Agg_table
+GROUP BY gender
+;
+
+SELECT AVG(max_age)
+FROM 
+( SELECT gender, AVG(age) AS ave_age, MAX(age) AS max_age, MIN(age) AS min_age, COUNT(age)
+FROM employee_demographics
+GROUP BY gender) AS Agg_table
+;
+
+-- WINDOW functions: look at a partition or group but they each keep their own unique rows in the output
+
+-- RANK
+
+-- DENSE RANK
+
+
+
 
