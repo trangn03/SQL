@@ -378,11 +378,62 @@ GROUP BY gender) AS Agg_table
 ;
 
 -- WINDOW functions: look at a partition or group but they each keep their own unique rows in the output
+-- Normal
+SELECT gender, AVG(salary) AS avg_salary
+FROM employee_demographics AS dem
+JOIN employee_salary AS sal
+	ON dem.employee_id = sal.employee_id
+GROUP BY gender
+;
 
--- RANK
+-- Window
+SELECT gender, AVG(salary) OVER(PARTITION BY gender)
+FROM employee_demographics AS dem
+JOIN employee_salary AS sal
+	ON dem.employee_id = sal.employee_id
+;
 
--- DENSE RANK
+SELECT dem.first_name, dem.last_name, gender, AVG(salary) OVER(PARTITION BY gender)
+FROM employee_demographics AS dem
+JOIN employee_salary AS sal
+	ON dem.employee_id = sal.employee_id
+;
+-- Rolling Total: start at a specific value and add on values from subsequent rows 
+SELECT dem.first_name, dem.last_name, gender, 
+SUM(salary) OVER(PARTITION BY gender ORDER BY dem.employee_id) AS Rolling_Total
+FROM employee_demographics AS dem
+JOIN employee_salary AS sal
+	ON dem.employee_id = sal.employee_id
+;
 
+-- Row number based off of everything
+SELECT dem.employee_id, dem.first_name, dem.last_name, gender, 
+ROW_NUMBER() OVER(PARTITION BY gender ORDER BY salary DESC) 
+FROM employee_demographics AS dem
+JOIN employee_salary AS sal
+	ON dem.employee_id = sal.employee_id
+;
+
+-- RANK: encounters duplicate, next number is not going to be the next number numerically -> positionally
+SELECT dem.employee_id, dem.first_name, dem.last_name, gender, 
+ROW_NUMBER() OVER(PARTITION BY gender ORDER BY salary DESC) AS row_num,
+RANK() OVER(PARTITION BY gender ORDER BY salary DESC) AS rank_num
+FROM employee_demographics AS dem
+JOIN employee_salary AS sal
+	ON dem.employee_id = sal.employee_id
+;
+
+-- DENSE RANK: still duplicates but get the next number numerically
+SELECT dem.employee_id, dem.first_name, dem.last_name, gender, 
+ROW_NUMBER() OVER(PARTITION BY gender ORDER BY salary DESC) AS row_num,
+RANK() OVER(PARTITION BY gender ORDER BY salary DESC) AS rank_num,
+DENSE_RANK() OVER(PARTITION BY gender ORDER BY salary DESC) AS dense_rank_num
+FROM employee_demographics AS dem
+JOIN employee_salary AS sal
+	ON dem.employee_id = sal.employee_id
+;
+
+-- CTEs (Common Table Expressions)
 
 
 
