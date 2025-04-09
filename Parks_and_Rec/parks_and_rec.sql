@@ -436,15 +436,81 @@ JOIN employee_salary AS sal
 -- CTEs (Common Table Expressions)
 WITH CTE_Example AS 
 (
-SELECT gender, AVG(salary) avg_sal, MAX(salary), MIN(salary), COUNT(salary)
+SELECT gender, AVG(salary) avg_sal, MAX(salary) max_sal, MIN(salary) min_sal, COUNT(salary) count_sal
 FROM employee_demographics dem
 JOIN employee_salary sal
 	ON dem.employee_id = sal.employee_id
 GROUP BY gender
 )
-SELECT * 
-FROM CTE_Example
+SELECT *
+FROM CTE_Example;
 
+WITH CTE_Example AS 
+(
+SELECT gender, AVG(salary) avg_sal, MAX(salary) max_sal, MIN(salary) min_sal, COUNT(salary) count_sal
+FROM employee_demographics dem
+JOIN employee_salary sal
+	ON dem.employee_id = sal.employee_id
+GROUP BY gender
+)
+SELECT AVG(avg_sal)
+FROM CTE_Example
+;
+
+SELECT AVG(avg_sal)
+FROM
+(
+SELECT gender, AVG(salary) avg_sal, MAX(salary) max_sal, MIN(salary) min_sal, COUNT(salary) count_sal
+FROM employee_demographics dem
+JOIN employee_salary sal
+	ON dem.employee_id = sal.employee_id
+GROUP BY gender
+) exmaple_subquery
+;
+
+WITH CTE_Example AS 
+(
+SELECT employee_id, gender, birth_date
+FROM employee_demographics dem
+WHERE birth_date > '1985-01-01'
+),
+CTE_Example2 AS
+(
+SELECT employee_id, salary
+FROM employee_salary
+WHERE salary > 50000
+)
+SELECT *
+FROM CTE_Example
+JOIN CTE_Example2
+	ON CTE_Example.employee_id = CTE_Example2.employee_id
+;
+
+-- TEMPORARY TABLE
+-- for storing complex result in a certain time
+CREATE TEMPORARY TABLE temp_table
+(first_name varchar(50),
+last_name varchar(50),
+favorite_movie varchar(100)
+);
+SELECT *
+FROM temp_table;
+
+INSERT INTO temp_table
+VALUES('Trang', 'Ngo', 'Minions');
+SELECT *
+FROM temp_table;
+
+SELECT *
+FROM employee_salary;
+
+CREATE TEMPORARY TABLE salary_over_50k
+SELECT *
+FROM employee_salary
+WHERE salary > 50000;
+
+SELECT *
+FROM salary_over_50k;
 
 
 
